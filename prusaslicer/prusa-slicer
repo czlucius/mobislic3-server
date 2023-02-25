@@ -1,0 +1,4 @@
+#!/bin/bash
+DIR=$(readlink -f "$0" | xargs dirname)
+export LD_LIBRARY_PATH="$DIR/bin"
+exec "$DIR/bin/prusa-slicer" "$@"
