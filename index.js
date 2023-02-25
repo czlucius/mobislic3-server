@@ -7,7 +7,7 @@ const fs = require("fs")
 const app = express()
 //app.use(fileUpload());
 app.use(
-    bodyParser.raw({ limit: "50mb", type: ['model/*'] })
+    bodyParser.raw({limit: "50mb", type: ['model/*']})
 );
 //const upload = multer({ dest: "uploads/" });
 //app.use(express.json());
@@ -15,40 +15,42 @@ app.use(
 
 
 app.get("/", (req, res) => {
-	res.send("hello world")
+    res.send("hello world")
 })
 
 app.post("/3d", (req, res) => {
-	const type = req.get('Content-Type')
-	const ext = type.split("/")[1]
-console.log("ext", ext);
+    const type = req.get('Content-Type')
+    const ext = type.split("/")[1]
+    console.log("ext", ext);
 //	console.log(req)
-	const b = req.body
-	const fileName = "file_"  + new Date().toISOString() + "." +ext
-fs.writeFile(fileName, b,  "binary",function(err) {
-    if(err) {
-        console.log(err)	
-    } else {
-        console.log("The file was saved!");
-	exec(`./prusaslicer/prusa-slicer -g ${fileName} --output apple.gcode`, (err, stdout, stderr) => {
-  if (err) {
-    // node couldn't execute the command
-    return;
-  }
+    const b = req.body
+    const fileName = "file_" + new Date().toISOString() + "." + ext
+    fs.writeFile(fileName, b, "binary", function (err) {
+        if (err) {
+            console.log(err)
+        } else {
+            console.log("The file was saved!");
+            const outFile = "out_" + new Date().toISOString() + ".gcode"
+            exec(`./prusaslicer/prusa-slicer -g ${fileName} --output ${outFile}`, (err, stdout, stderr) => {
+                if (err) {
+                    // node couldn't execute the command
+                    return;
+                }
 
-  // the *entire* stdout and stderr (buffered)
-  console.log(`stdout: ${stdout}`);
-  console.log(`stderr: ${stderr}`);
-	setTimeout(5000, 
-});
-    }
-});
+                // the *entire* stdout and stderr (buffered)
+                console.log(`stdout: ${stdout}`);
+                console.log(`stderr: ${stderr}`);
+                // Completed:
+                res.sendFile(outFile)
+
+            });
+        }
+    });
 })
 
 
-
-app.listen(28508, ()=>{
-console.log("listening on 28508")
+app.listen(28508, () => {
+    console.log("listening on 28508")
 })
 ///
 //console.log("h")
